@@ -24,7 +24,7 @@
         var arToolKitSource, arToolKitContext;
         var markerHiro;
         var theta = 0;
-		var poy = 0;
+		var poy = 0, flag = 0;
 
         init();
         animate();
@@ -144,14 +144,14 @@
             theta += 0.1;
             markerHiro.children[0].position.set(0.5 * Math.sin(theta), 0.1, 0.5 * Math.cos(theta));
 			
-			markerHiro.children[1].position.set(0, poy, 0);
-			if(markerHiro.children[1].position.y < 1){
+			if(flag == 0){
 				poy+=0.01;
 			}
 			else{
-				poy -=0.01;
-				markerHiro.children[1].position.set(0, poy, 0);
+				poy-=0.01;
 			}
+			markerHiro.children[1].position.set(0, poy, 0);
+			if(poy >= 1 || poy < 0) flag = !flag;
 			
             renderer.render(scene, camera);
         }
