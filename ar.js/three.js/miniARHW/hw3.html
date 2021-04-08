@@ -43,9 +43,7 @@
         var group;
         var isActive = false;
         var omega = 0;
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        var halfH, halfW, whRatio = w / h;
+        var halfH, halfW, whRatio;
         var button;
         var mouse = new THREE.Vector2();
         var raycaster = new THREE.Raycaster();
@@ -58,27 +56,20 @@
                 this.size = size;
                 let material = new THREE.MeshBasicMaterial({
                     color: colorString,
-                    transparent: false
-                    //opacity: 0.7
+                    transparent: true,
+                    opacity: 0.7
                 });
-
                 if (map)
                     material.map = map;
-                this.mesh = new THREE.Mesh(new THREE.CircleGeometry(size, 36), material);
+                this.mesh = new THREE.Mesh(new THREE.CircleGeometry(size, 32), material);
                 this.mesh.position.set(cx, cy, 0);
             }
             setLocation(lx, ly) {
                 this.mesh.position.set(lx, ly, 0);
             }
-			d1To(v) {
-				return Math.abs (v[0]-this.centerX) + Math.abs(v[1]-this.centerY);
-			}
             d2To(v) {
-                return Math.sqrt(v[0] - this.centerX) * (v[0] - this.centerX) + (v[1] - this.centerY) * (v[1] - this.centerY);
+                return Math.sqrt((v[0] - this.centerX) * (v[0] - this.centerX) + (v[1] - this.centerY) * (v[1] - this.centerY));
             }
-			dInfTo(v) {
-				return Math.max( Math.abs (v[0]-this.centerX), Math.abs(v[1]-this.centerY) )
-			}
         }
 
         init();
@@ -94,7 +85,6 @@
 
                 document.addEventListener('touchstart', onTouchStart, false);
                 document.addEventListener('touchend', onTouchEnd, false);
-
 
             } else {
                 $('#hw3').css('color', 'red');
@@ -116,6 +106,8 @@
             renderer.domElement.style.top = '0px'
             renderer.domElement.style.left = '0px'
             document.body.appendChild(renderer.domElement);
+
+            whRatio = window.innerWidth / window.innerHeight;
 
             stats = new Stats();
             document.body.appendChild(stats.dom);
@@ -179,7 +171,6 @@
         }
 
         function addMarkerHiro() {
-
             markerRoot = new THREE.Group()
 
             var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
@@ -202,7 +193,7 @@
                     /*var texMat = new THREE.MeshBasicMaterial({
                       map: texture
                     }); */
-                    button = new Button(-halfW / 2, -halfH / 2, halfH / 8, 'cyan', texture);
+                    button = new Button(-halfW / 2, -halfH / 2, halfH / 3, 'cyan', texture);
                     sceneHUD.add(button.mesh);
                     pickables.push(button.mesh);
                 },
@@ -238,7 +229,7 @@
             group.add(circle2);
             group.rotation.x = -1.5 * Math.PI;
 
-            let geometry3 = new THREE.CylinderGeometry(0.3, 0.5, 0.2, 64);
+            let geometry3 = new THREE.CylinderGeometry(0.3, 0.5, 0.2, 32);
             let material3 = new THREE.MeshBasicMaterial({
                 color: 'white'
             });
@@ -258,33 +249,6 @@
             markerRoot.add(group);
             markerRoot.add(group2);
             return markerRoot;
-            /*
-            // add a torus knot & a transparent box	
-            var geometry	= new THREE.TorusKnotGeometry(0.3,0.1,64,16);
-            var material	= new THREE.MeshNormalMaterial();
-            var mesh	= new THREE.Mesh( geometry, material );
-            mesh.position.y	= 0.5
-            markerRoot.add (mesh);
-            
-            mesh = new THREE.Mesh (new THREE.BoxGeometry(1,1,1), 
-            			new THREE.MeshNormalMaterial({transparent:true, opacity:0.3}));
-            mesh.position.y	= 0.5
-            markerRoot.add (mesh);
-            */
-
-            /*
-            var ball = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 20), new THREE.MeshNormalMaterial());
-            markerRoot.add(ball);
-            ball.position.y = 0.5;
-			
-            //var chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.5, 12), new THREE.MeshNormalMaterial());
-            m = new THREE.MeshBasicMaterial({color: 0xff0000});
-            var chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.5, 12), m);
-            markerRoot.add(chimney);
-			
-            var grid = new THREE.GridHelper(1, 10, 'red', 'white');
-            markerRoot.add(grid);
-			*/
         }
 
         function animate() {
@@ -294,6 +258,7 @@
             if (arToolkitSource.ready === false) return
             arToolkitContext.update(arToolkitSource.domElement)
 
+            renderer.clear();
             renderer.render(scene, camera);
             button.mesh.material.visible = markerRoot.visible;
             renderer.render(sceneHUD, cameraHUD);
@@ -319,8 +284,6 @@
                 $('#text').css('color', 'green');
                 $('#text').html('<p id="text" style ="color:green;text-align:center;margin-right:48%;margin-left:48%;">green</p>');
             }
-
-
         }
 
         function clamp(x, xLo, xHi) {
@@ -368,8 +331,6 @@
 
         function onMouseDown(event) {
             event.preventDefault();
-
-
 
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
