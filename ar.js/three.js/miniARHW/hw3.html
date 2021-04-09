@@ -237,13 +237,13 @@
             cylinder.position.set(0, 0, 0);
             group2.add(cylinder);
 
-            let geometry4 = new THREE.ConeGeometry(0.4, 0.6, 3);
+            let geometry4 = new THREE.ConeGeometry(0.2, 0.6, 3);
             let material4 = new THREE.MeshBasicMaterial({
                 color: 'white'
             });
             let cone = new THREE.Mesh(geometry4, material4);
             cone.rotateX(-90 * Math.PI / 180);
-            cone.position.set(0, -0.1, -0.4);
+            cone.position.set(0, 0, -0.4);
             group2.add(cone);
 
             markerRoot.add(group);
