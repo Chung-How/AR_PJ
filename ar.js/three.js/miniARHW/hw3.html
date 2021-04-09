@@ -16,11 +16,11 @@
         - three.js<br>
         Minimal Version
         <div id="info">hw3<br>
-            <p id="press" style="color:black;text-align:center;">
+            <p id="press" style="color:white;text-align:center;">
                 did not press
             </p>
 
-            <p id="text" style="color:white">
+            <p id="text" style="color:yellow">
                 color
             </p>
         </div>
@@ -81,13 +81,13 @@
 
             if (_iOSDevice) {
 
-                $('#hw3').css('color', 'black');
+                $('#hw3').css('color', 'white');
 
                 document.addEventListener('touchstart', onTouchStart, false);
                 document.addEventListener('touchend', onTouchEnd, false);
 
             } else {
-                $('#hw3').css('color', 'red');
+                $('#hw3').css('color', 'white');
 
                 document.addEventListener('mousedown', onMouseDown, false);
                 document.addEventListener('mouseup', onMouseUp, false);
@@ -276,13 +276,13 @@
             group2.rotation.y = angle;
             if (angle % (2 * Math.PI) >= (1 / 3 * Math.PI) && angle % (2 * Math.PI) < Math.PI) {
                 $('#text').css('color', 'red');
-                $('#text').html('<p id="text" style ="color:red;text-align:center;margin-right:48%;margin-left:48%;">red</p>');
+                $('#text').html('<p id="text" style ="color:red;text-align:center;">red</p>');
             } else if (angle % (2 * Math.PI) >= Math.PI && angle % (2 * Math.PI) < (5 / 3 * Math.PI)) {
                 $('#text').css('color', 'blue');
-                $('#text').html('<p id="text" style ="color:blue;text-align:center;margin-right:48%;margin-left:48%;">blue</p>');
+                $('#text').html('<p id="text" style ="color:blue;text-align:center;">blue</p>');
             } else {
                 $('#text').css('color', 'green');
-                $('#text').html('<p id="text" style ="color:green;text-align:center;margin-right:48%;margin-left:48%;">green</p>');
+                $('#text').html('<p id="text" style ="color:green;text-align:center;">green</p>');
             }
         }
 
@@ -308,12 +308,8 @@
 
                 if (intersects.length > 0) {
                     $('#press').css('color', 'yellow');
-                    $('#press').html('<p id="press" style ="color:black;text-align:center;">press</p>');
+                    $('#press').html('<p id="press" style ="color:white;text-align:center;">press</p>');
                     isActive = true;
-                } else {
-                    $('#press').css('color', 'green');
-                    $('#press').html('<p id="press" style ="color:black;text-align:center;">press the wrong place</p>');
-                    isActive = false;
                 }
             }
         }
@@ -324,7 +320,7 @@
             var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
                 $('#press').css('color', 'cyan');
-                $('#press').html('<p id="press" style ="color:black;text-align:center;">did not press</p>');
+                $('#press').html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
                 isActive = false;
             }
         }
@@ -342,21 +338,16 @@
 
             if (intersects.length > 0) {
                 $('#press').css('color', 'yellow');
-                $('#press').html('<p id="press" style ="color:black;text-align:center;">press</p>');
+                $('#press').html('<p id="press" style ="color:white;text-align:center;">press</p>');
                 isActive = true;
-            } else {
-                $('#press').css('color', 'green');
-                $('#press').html('<p id="press" style ="color:black;text-align:center;">press the wrong place</p>');
-                isActive = false;
             }
-
         }
 
         function onMouseUp(event) {
             event.preventDefault();
 
             $('#press').css('color', 'cyan');
-            $('#press').html('<p id="press" style ="color:black;text-align:center;">did not press</p>');
+            $('#press').html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
             isActive = false;
 
         }
