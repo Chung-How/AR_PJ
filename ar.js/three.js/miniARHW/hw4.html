@@ -219,7 +219,11 @@
                 wireframe: true
             }));
             markerRootHiro.add(ball);
-
+			
+			let barrel = cannon.children[1]
+			barrel.rotation.z = -Math.PI/6; // barrel angle
+			cannon.rotation.y = -Math.PI/6;
+			
             return markerRootHiro;
         }
 
