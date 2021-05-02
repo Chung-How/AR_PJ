@@ -16,7 +16,6 @@
         <br>
         Independent Markers
         <p style='color:yellow' id='printDis'></p>
-        <p id='touch'></p>
         <p id='ratio'></p>
     </div>
 
@@ -249,7 +248,7 @@
             let body = new THREE.Mesh(new THREE.SphereGeometry(
                 0.5, 20, 20, Math.PI + Math.PI * 0.1, Math.PI * 1.8, 0, Math.PI / 2), new THREE.MeshNormalMaterial());
             let barrelPart = new THREE.Group();
-            let barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2, 18), new THREE.MeshNormalMaterial());
+            let barrel = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 2, 18), new THREE.MeshNormalMaterial());
             barrelPart.add(barrel);
             barrel.position.y = 1;
 
@@ -296,7 +295,7 @@
             arToolkitContext.update(arToolkitSource.domElement)
 
             ///////////////////////////////////////////////////////////
-            button1.cannon.material.visible = markerRoot.visible;
+            //button1.cannon.material.visible = markerRoot.visible;
 
             renderer.render(sceneHUD, cameraHUD);
 
@@ -331,8 +330,6 @@
 
             let dist = button1.d2To(HUD_coord);
             let printStr = [dist.toFixed(2), HUD_coord[0].toFixed(2), HUD_coord[1].toFixed(2)];
-
-            $('#touch').text(`[${printStr[0]}]: (${printStr[1]}, ${printStr[2]})`);
 
             if (dist < button1.size) { // distance VS. radius
                 console.log('picked')
