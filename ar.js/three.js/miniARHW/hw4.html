@@ -148,7 +148,7 @@
                 patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.kanji'
             })
             // add a sphere for Hiro
-            var ball = new THREE.Mesh(new THREE.SphereGeometry(2, 8, 8), new THREE.MeshBasicMaterial({
+            var ball = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({
                 color: 'yellow',
                 wireframe: true
             }));
@@ -161,7 +161,7 @@
         function makeCannon() {
             let cannon = new THREE.Group();
             let body = new THREE.Mesh(new THREE.SphereGeometry(
-                10, 20, 20, Math.PI + Math.PI * 0.1, Math.PI * 1.8, 0, Math.PI / 2), new THREE.MeshNormalMaterial());
+                0.5, 20, 20, Math.PI + Math.PI * 0.1, Math.PI * 1.8, 0, Math.PI / 2), new THREE.MeshNormalMaterial());
             let barrelPart = new THREE.Group();
             let barrel = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 20, 18), new THREE.MeshNormalMaterial());
             barrelPart.add(barrel);
