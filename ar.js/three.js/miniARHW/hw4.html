@@ -137,6 +137,11 @@
             cannon = makeCannon();
 
             markerRootHiro.add(cannon);
+            var ball = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({
+                color: 'yellow',
+                wireframe: true
+            }));
+            markerRootHiro.add(ball);
 
             return markerRootHiro;
         }
@@ -148,12 +153,12 @@
                 patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.kanji'
             })
             // add a sphere for Hiro
-            var ball = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({
-                color: 'yellow',
-                wireframe: true
-            }));
+            var geometry = new THREE.SphereGeometry(0.1, 20, 20);
+            var material = new THREE.MeshNormalMaterial();
+            box2 = new THREE.Mesh(geometry, material);
+            box2.position.y = 0.1;
 
-            markerRootKanji.add(ball);
+            markerRootKanji.add(box2);
 
             return markerRootKanji;
         }
