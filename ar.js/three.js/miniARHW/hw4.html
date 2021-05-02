@@ -60,7 +60,8 @@
         var cannon;
         var pos, vel, force;
         var button1;
-		var down = false, fire = false;
+        var down = false,
+            fire = false;
 
         var _iOSDevice;
 
@@ -299,20 +300,20 @@
                 computeInitPosVel();
                 return;
             }
-			
-			if(fire){
-				if (pos.y < 0)
-					return;
-	
-				let dt = clock.getDelta();
 
-				// Euler's method
-				vel.add(force.clone().multiplyScalar(dt));
-				pos.add(vel.clone().multiplyScalar(dt));
-				ball.position.copy(pos);
-			}
-			
-			if (down) {
+            if (fire) {
+                if (pos.y < 0)
+                    return;
+
+                let dt = clock.getDelta();
+
+                // Euler's method
+                vel.add(force.clone().multiplyScalar(dt));
+                pos.add(vel.clone().multiplyScalar(dt));
+                ball.position.copy(pos);
+            }
+
+            if (down) {
                 $('#ratio').text("down");
             } else {
                 $('#ratio').text("up");
