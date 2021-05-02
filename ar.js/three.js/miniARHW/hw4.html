@@ -16,7 +16,6 @@
         <br>
         Independent Markers
         <p style='color:yellow' id='printDis'></p>
-        <p id='ratio'></p>
     </div>
 
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -248,7 +247,7 @@
             let body = new THREE.Mesh(new THREE.SphereGeometry(
                 0.5, 20, 20, Math.PI + Math.PI * 0.1, Math.PI * 1.8, 0, Math.PI / 2), new THREE.MeshNormalMaterial());
             let barrelPart = new THREE.Group();
-            let barrel = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 2, 18), new THREE.MeshNormalMaterial());
+            let barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 2, 18), new THREE.MeshNormalMaterial());
             barrelPart.add(barrel);
             barrel.position.y = 1;
 
@@ -314,12 +313,6 @@
                 vel.add(force.clone().multiplyScalar(dt));
                 pos.add(vel.clone().multiplyScalar(dt));
                 ball.position.copy(pos);
-            }
-
-            if (down) {
-                $('#ratio').text("down");
-            } else {
-                $('#ratio').text("up");
             }
         }
 
