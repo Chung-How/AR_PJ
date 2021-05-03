@@ -232,6 +232,11 @@
             event.preventDefault();
             
             var touches = event.changedTouches;
+			
+			if (event.button === 0) {
+                    setTimeout(spriteAnimate, 0);
+            }
+			
             for (var i = 0; i < touches.length; i++) {
                 
                 mouse.x = (touches[i].pageX / window.innerWidth) * 2 - 1;
@@ -241,10 +246,6 @@
                 raycaster.setFromCamera(mouse, cameraHUD);
                 
                 var intersects = raycaster.intersectObjects(pickables);
-                
-                if (event.button === 0) {
-                    setTimeout(spriteAnimate, 0);
-                }
             }
         }
         
@@ -252,12 +253,12 @@
             event.preventDefault();
             
             var touches = event.changedTouches;
+			
             for (var i = 0; i < touches.length; i++) {
                 $('#press')
                     .css('color', 'cyan');
                 $('#press')
                     .html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
-                isActive = false;
             }
         }
         
