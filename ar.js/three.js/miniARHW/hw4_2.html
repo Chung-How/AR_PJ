@@ -8,22 +8,23 @@
 <script src="../build/ar.js"></script>
 <script>
     THREEx.ArToolkitContext.baseURL = '../'
+    
 </script>
 
 <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
     <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
         <a href="https://github.com/jeromeetienne/AR.js/" target="_blank">AR.js</a>
         <br />
-		Billboarded Explode (Hiro)
+        Billboarded Explode (Hiro)
     </div>
-
-	
-	<script src="explode.js"></script>
+    
+    
+    <script src="explode.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://threejs.org/build/three.min.js"></script>
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.js"></script>
-
+    
     <script>
         // global variables
         var camera, cameraHUD, scene, sceneHUD, renderer;
@@ -41,28 +42,24 @@
         var mouse = new THREE.Vector2();
         var raycaster = new THREE.Raycaster();
         var pickables = [];
-
+        var aimGroup;
+        
         init();
         animate();
-
+        
         function init() {
-
+            
             var _iOSDevice = !!navigator.platform.match(/iPhone|iPod|iPad|Android/);
-
+            
             if (_iOSDevice) {
-
-                $('#hw3').css('color', 'white');
-
                 document.addEventListener('touchstart', onTouchStart, false);
                 document.addEventListener('touchend', onTouchEnd, false);
-
+                
             } else {
-                $('#hw3').css('color', 'white');
-
                 document.addEventListener('mousedown', onMouseDown, false);
                 document.addEventListener('mouseup', onMouseUp, false);
             }
-
+            
             // init renderer
             renderer = new THREE.WebGLRenderer({
                 // antialias	: true,
@@ -76,42 +73,42 @@
             renderer.domElement.style.top = '0px'
             renderer.domElement.style.left = '0px'
             document.body.appendChild(renderer.domElement);
-
+            
             whRatio = window.innerWidth / window.innerHeight;
-
+            
             stats = new Stats();
             document.body.appendChild(stats.dom);
-
+            
             // init scene and camera
             scene = new THREE.Scene();
             sceneHUD = new THREE.Scene();
-
+            
             halfH = 10;
             halfW = halfH * whRatio;
-
+            
             // Create a BASIC camera
             camera = new THREE.Camera();
             cameraHUD = new THREE.OrthographicCamera(-halfW, halfW, halfH, -halfH, -10, 10);
             scene.add(camera);
-
+            
             ////////////////////////////////////////////////////////////////////////////////
             //          handle arToolkitSource
             ////////////////////////////////////////////////////////////////////////////////
-
+            
             arToolkitSource = new THREEx.ArToolkitSource({
                 // to read from the webcam 
-                sourceType: 'webcam',
-            })
-
+                sourceType: 'webcam'
+            , })
+            
             arToolkitSource.init(function onReady() {
                 onResize()
             })
-
+            
             // handle resize
-            window.addEventListener('resize', function() {
+            window.addEventListener('resize', function () {
                 onResize()
             })
-
+            
             function onResize() {
                 arToolkitSource.onResize()
                 arToolkitSource.copySizeTo(renderer.domElement)
@@ -122,27 +119,27 @@
             ////////////////////////////////////////////////////////////////////////////////
             //          initialize arToolkitContext
             ////////////////////////////////////////////////////////////////////////////////
-
+            
             arToolkitContext = new THREEx.ArToolkitContext({
-                cameraParametersUrl: THREEx.ArToolkitContext.baseURL + '../data/data/camera_para.dat',
-                detectionMode: 'mono',
-                maxDetectionRate: 30,
-                canvasWidth: 80 * 3,
-                canvasHeight: 60 * 3,
-            })
+                cameraParametersUrl: THREEx.ArToolkitContext.baseURL + '../data/data/camera_para.dat'
+                , detectionMode: 'mono'
+                , maxDetectionRate: 30
+                , canvasWidth: 80 * 3
+                , canvasHeight: 60 * 3
+            , })
             // initialize it
             arToolkitContext.init(function onCompleted() {
                 // copy projection matrix to camera
                 camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
             })
-			
+            
             height = 15;
             width = height * whRatio;
-
+            
             let geometry = new THREE.CircleGeometry(2.5, 32);
             let material = new THREE.MeshBasicMaterial();
             button = new THREE.Mesh(geometry, material);
-			var loader = new THREE.TextureLoader();
+            var loader = new THREE.TextureLoader();
             loader.load(
                 'https://i.imgur.com/s6VLMFm.png'
                 , function (texture) {
@@ -155,16 +152,16 @@
             );
             button.position.y = -(height / 3 * 2);
             sceneHUD.add(button);
-			
+            
             markerHiro = addMarkerHiro();
             scene.add(markerHiro);
-			
-			// to trigger explosion
+            
+            // to trigger explosion
             window.addEventListener('mousedown', doMouseDown, false);
             // initialize explosion sprite
             initSprite(markerHiro);
         }
-
+        
         function addMarkerHiro() {
             let markerRootHiro = new THREE.Group();
             var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRootHiro, {
@@ -172,86 +169,117 @@
                 , patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro'
             })
             
-            // nothing to added here (for now)	
+            let loader = new THREE.TextureLoader();
+            loader.setCrossOrigin('')
+            let texture = loader.load('https://i.imgur.com/sFfSAYH.png?1');
+            
+            let material = new THREE.MeshBasicMaterial({
+                map: texture,
+                //color: 0xffff00,
+                side: THREE.DoubleSide
+            });
+            let geometry = new THREE.PlaneGeometry(1, 1);
+            let mesh = new THREE.Mesh(geometry, material);
+            //mesh.position.y	= geometry.parameters.height/2 // mesh centered at root
+            aimGroup = new THREE.Object3D();
+            aimGroup.add(mesh);
+            let origin = new THREE.Mesh(new THREE.OctahedronGeometry(0.1), new THREE.MeshNormalMaterial());
+            markerRootHiro.add(aimGroup, origin);
+            
+            /// add gridhelper
+            var gridXZ = new THREE.GridHelper(1, 10);
+            //markerRootHiro.add (gridXZ);
+            
             return markerRootHiro;
         }
-
+        
         function animate() {
             requestAnimationFrame(animate);
             stats.update();
-
+            
             if (arToolkitSource.ready === false) return
             arToolkitContext.update(arToolkitSource.domElement)
-
+            
+            let localCamera = markerHiro.worldToLocal(new THREE.Vector3(0, 0, 0));
+            
+            //to rotate (0, 0, 1) to localCamera [markerCoord]
+            let point = new THREE.Vector3(0, 0, 1);
+            let angle = point.angleTo(localCamera);
+            let axis = new THREE.Vector3();
+            axis.crossVectors(point, localCamera)
+                .normalize();
+            aimGroup.quaternion.setFromAxisAngle(axis, angle);
+            
             renderer.clear();
             renderer.render(scene, camera);
             renderer.render(sceneHUD, cameraHUD);
         }
-
+        
         function onTouchStart(event) {
             event.preventDefault();
-
+            
             var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
-
+                
                 mouse.x = (touches[i].pageX / window.innerWidth) * 2 - 1;
                 mouse.y = -(touches[i].pageY / window.innerHeight) * 2 + 1;
-
+                
                 // find intersections (only pick the HUD scene, using OrthographicCamera)  		
                 raycaster.setFromCamera(mouse, cameraHUD);
-
+                
                 var intersects = raycaster.intersectObjects(pickables);
-
-                if (intersects.length > 0) {
-                    $('#press').css('color', 'yellow');
-                    $('#press').html('<p id="press" style ="color:white;text-align:center;">press</p>');
-                    isActive = true;
+                
+                if (event.button === 0) {
+                    setTimeout(spriteAnimate, 0);
                 }
             }
         }
-
+        
         function onTouchEnd(event) {
             event.preventDefault();
-
+            
             var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
-                $('#press').css('color', 'cyan');
-                $('#press').html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
+                $('#press')
+                    .css('color', 'cyan');
+                $('#press')
+                    .html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
                 isActive = false;
             }
         }
-
+        
         function onMouseDown(event) {
             event.preventDefault();
-
+            
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+            
             // find intersections (only pick the HUD scene, using OrthographicCamera)  		
             raycaster.setFromCamera(mouse, cameraHUD);
-
+            
             var intersects = raycaster.intersectObjects(pickables);
-
-            if (intersects.length > 0) {
-                $('#press').css('color', 'yellow');
-                $('#press').html('<p id="press" style ="color:white;text-align:center;">press</p>');
-                isActive = true;
-            }
-        }
-
-        function onMouseUp(event) {
-            event.preventDefault();
-
-            $('#press').css('color', 'cyan');
-            $('#press').html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
-            isActive = false;
-
-        }
-		
-		function doMouseDown(event) {
+            
             if (event.button === 0) {
                 setTimeout(spriteAnimate, 0);
             }
         }
+        
+        function onMouseUp(event) {
+            event.preventDefault();
+            
+            $('#press')
+                .css('color', 'cyan');
+            $('#press')
+                .html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
+            isActive = false;
+            
+        }
+        
+        function doMouseDown(event) {
+            if (event.button === 0) {
+                setTimeout(spriteAnimate, 0);
+            }
+        }
+        
     </script>
 </body>
