@@ -157,11 +157,11 @@
             scene.add(markerHiro);
             
             // to trigger explosion
-            window.addEventListener('mousedown', doMouseDown, false);
+            //window.addEventListener('mousedown', doMouseDown, false);
             // initialize explosion sprite
-            initSprite(markerHiro);
+            //initSprite(markerHiro);
             
-            setUpOffsetArray();
+            //setUpOffsetArray();
             sprite = buildSprite();
             group.add(sprite);
         }
@@ -231,12 +231,11 @@
         function onTouchStart(event) {
             event.preventDefault();
             
-			if (event.button === 0) {
+            if (event.button === 0) {
                 setTimeout(spriteAnimate, 0);
             }
             var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
-                
                 mouse.x = (touches[i].pageX / window.innerWidth) * 2 - 1;
                 mouse.y = -(touches[i].pageY / window.innerHeight) * 2 + 1;
                 
@@ -246,16 +245,8 @@
                 var intersects = raycaster.intersectObjects(pickables);
                 
                 if (intersects.length > 0) {
-                    $('#press')
-                        .css('color', 'yellow');
-                    $('#press')
-                        .html('<p id="press" style ="color:black;text-align:center;">press</p>');
                     setTimeout(spriteAnimate, 0);
                 } else {
-                    $('#press')
-                        .css('color', 'green');
-                    $('#press')
-                        .html('<p id="press" style ="color:black;text-align:center;">press the wrong place</p>');
                     isActive = false;
                 }
             }
@@ -265,7 +256,7 @@
             event.preventDefault();
             
             var touches = event.changedTouches;
-            
+            setTimeout(spriteAnimate, 1000);
             for (var i = 0; i < touches.length; i++) {
                 $('#press')
                     .css('color', 'cyan');
@@ -293,11 +284,7 @@
         function onMouseUp(event) {
             event.preventDefault();
             
-            $('#press')
-                .css('color', 'cyan');
-            $('#press')
-                .html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
-            isActive = false;
+            setTimeout(spriteAnimate, 1000);
         }
         
         function doMouseDown(event) {
@@ -310,10 +297,7 @@
             const size = 2.0;
             
             // old school ...
-            let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0
-                
-                
-                , size / 2, size / 2, 0, -size / 2, size / 2, 0];
+            let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0 , size / 2, size / 2, 0, -size / 2, size / 2, 0];
             var geometry = new THREE.BufferGeometry();
             geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             
@@ -375,10 +359,8 @@
                 console.log('return in spriteAnimate')
                 return;
             }
-            
             baseS = baseT = 0;
             setTimeout(_spriteAnimate, 100);
         }
-        
     </script>
 </body>
