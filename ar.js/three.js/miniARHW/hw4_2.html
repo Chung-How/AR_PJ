@@ -43,9 +43,9 @@
         var raycaster = new THREE.Raycaster();
         var pickables = [];
         var aimGroup;
-		var uvOffsetArray;
-		var baseS, baseT;
-		var sprite;
+        var uvOffsetArray;
+        var baseS, baseT;
+        var sprite;
         
         init();
         animate();
@@ -160,10 +160,10 @@
             window.addEventListener('mousedown', doMouseDown, false);
             // initialize explosion sprite
             initSprite(markerHiro);
-			
-			setUpOffsetArray();
-			sprite = buildSprite();
-			group.add(sprite);
+            
+            setUpOffsetArray();
+            sprite = buildSprite();
+            group.add(sprite);
         }
         
         function addMarkerHiro() {
@@ -173,22 +173,24 @@
                 , patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro'
             })
             group = new THREE.Group();
-			markerRootHiro.add(group); 
-			
+            markerRootHiro.add(group);
+            
             let loader = new THREE.TextureLoader();
             loader.setCrossOrigin('');
             let geometry = new THREE.PlaneGeometry(1, 1);
             let material = new THREE.MeshBasicMaterial();
             let crosshair = new THREE.Mesh(geometry, material);
-			crosshair.rotation.x = -Math.PI/2;
-			loader.load(
-				'https://i.imgur.com/czAPVT8.png',
-				function ( texture ) {
-					crosshair.material = new THREE.MeshBasicMaterial( { map: texture } );
-					crosshair.material.transparent = true;
-				}
-			);
-			group.add(crosshair);
+            crosshair.rotation.x = -Math.PI / 2;
+            loader.load(
+                'https://i.imgur.com/czAPVT8.png'
+                , function (texture) {
+                    crosshair.material = new THREE.MeshBasicMaterial({
+                        map: texture
+                    });
+                    crosshair.material.transparent = true;
+                }
+            );
+            group.add(crosshair);
             
             return markerRootHiro;
         }
@@ -201,25 +203,26 @@
             arToolkitContext.update(arToolkitSource.domElement)
             
             // to rotate (0,0,1) to localCamera [markerCoord]
+            let localCamera = markerHiro.worldToLocal(new THREE.Vector3(0, 0, 0))
+            
+            let point = new THREE.Vector3(0, 0, 1);
+            let angle = point.angleTo(localCamera);
+            let axis = new THREE.Vector3();
+            axis.crossVectors(point, localCamera)
+                .normalize(); // normalization is IMPORTANT!
+            sprite.quaternion.setFromAxisAngle(axis, angle);
+            
+            /*
             let localCamera = markerHiro.worldToLocal (new THREE.Vector3(0,0,0))
-  
-			let point = new THREE.Vector3(0, 0, 1);
-			let angle = point.angleTo(localCamera);
-			let axis  = new THREE.Vector3();
-			axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
-			sprite.quaternion.setFromAxisAngle(axis, angle);
-			
-			/*
-			let localCamera = markerHiro.worldToLocal (new THREE.Vector3(0,0,0))
-			
-			// to rotate (0,0,1) to localCamera [markerCoord]
-			let point = new THREE.Vector3(0,0,1);
-			let angle = point.angleTo (localCamera);
-			let axis = new THREE.Vector3();
-			axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
-			aimGroup.quaternion.setFromAxisAngle (axis, angle);
-			*/
-			
+            
+            // to rotate (0,0,1) to localCamera [markerCoord]
+            let point = new THREE.Vector3(0,0,1);
+            let angle = point.angleTo (localCamera);
+            let axis = new THREE.Vector3();
+            axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
+            aimGroup.quaternion.setFromAxisAngle (axis, angle);
+            */
+            
             //renderer.clear();
             renderer.render(scene, camera);
             renderer.render(sceneHUD, cameraHUD);
@@ -228,12 +231,10 @@
         function onTouchStart(event) {
             event.preventDefault();
             
-            var touches = event.changedTouches;
-			
-			if (event.button === 0) {
-                    setTimeout(spriteAnimate, 0);
+            if (event.button === 0) {
+                setTimeout(spriteAnimate, 0);
             }
-			
+            var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
                 
                 mouse.x = (touches[i].pageX / window.innerWidth) * 2 - 1;
@@ -243,9 +244,10 @@
                 raycaster.setFromCamera(mouse, cameraHUD);
                 
                 var intersects = raycaster.intersectObjects(pickables);
-				if (event.button === 0) {
+                
+                if (intersects.length > 0) {
                     setTimeout(spriteAnimate, 0);
-				}
+                }
             }
         }
         
@@ -253,7 +255,7 @@
             event.preventDefault();
             
             var touches = event.changedTouches;
-			
+            
             for (var i = 0; i < touches.length; i++) {
                 $('#press')
                     .css('color', 'cyan');
@@ -300,7 +302,8 @@
             
             // old school ...
             let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0
-                    , size / 2, size / 2, 0, -size / 2, size / 2, 0];
+                    
+                , size / 2, size / 2, 0, -size / 2, size / 2, 0];
             var geometry = new THREE.BufferGeometry();
             geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             
@@ -312,17 +315,19 @@
             geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             
             var material = new THREE.MeshBasicMaterial();
-			var item = new THREE.Mesh(geometry, material);
-			item.position.y = 0.5;
-			var loader = new THREE.TextureLoader();
-			loader.load(
-				'https://i.imgur.com/j5NYK55.png',
-				function ( texture ) {
-				item.material = new THREE.MeshBasicMaterial( { map: texture } );
-				item.material.transparent = true;
-				}
-			);
-			return item;
+            var item = new THREE.Mesh(geometry, material);
+            item.position.y = 0.5;
+            var loader = new THREE.TextureLoader();
+            loader.load(
+                'https://i.imgur.com/j5NYK55.png'
+                , function (texture) {
+                    item.material = new THREE.MeshBasicMaterial({
+                        map: texture
+                    });
+                    item.material.transparent = true;
+                }
+            );
+            return item;
         }
         
         function setUpOffsetArray() {
