@@ -139,7 +139,7 @@
             height = 15;
             width = height * whRatio;
             
-            let geometry = new THREE.CircleGeometry(2.5, 32);
+            let geometry = new THREE.CircleGeometry(3, 32);
             let material = new THREE.MeshBasicMaterial();
             button = new THREE.Mesh(geometry, material);
             var loader = new THREE.TextureLoader();
@@ -180,7 +180,7 @@
 			
             let loader = new THREE.TextureLoader();
             loader.setCrossOrigin('');
-            let geometry = new THREE.PlaneGeometry(2, 2);
+            let geometry = new THREE.PlaneGeometry(1, 1);
             let material = new THREE.MeshBasicMaterial();
             let crosshair = new THREE.Mesh(geometry, material);
 			crosshair.rotation.x = -Math.PI/2;
