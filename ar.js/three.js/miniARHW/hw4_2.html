@@ -136,9 +136,6 @@
                 camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
             })
             
-            height = 15;
-            width = height * whRatio;
-            
             let geometry = new THREE.CircleGeometry(3, 32);
             let material = new THREE.MeshBasicMaterial();
             button = new THREE.Mesh(geometry, material);
@@ -153,7 +150,7 @@
                     });
                 }
             );
-            button.position.y = -(height / 3 * 2);
+            button.position.set(-halfW / 2, -halfH / 2, halfH / 3);
             sceneHUD.add(button);
             
             markerHiro = addMarkerHiro();
