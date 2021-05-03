@@ -36,7 +36,7 @@
         var uvOffsetArray;
         var baseS, baseT;
         var sprite;
-        var button;
+        var button, mouse, loader;
         
         class Button {
             constructor(cx, cy, size, colorString = 'yellow', map = null) {
@@ -202,6 +202,27 @@
             window.addEventListener('mousedown', doMouseDown, false);
             // initialize explosion sprite
             initSprite(markerHiro);
+        }
+		
+		function onMouseDown() {
+            //console.log("mouseDown");
+            raycaster.setFromCamera(mouse, cameraHUD);
+            var intersects = raycaster.intersectObjects(sceneHUD.children);
+            
+            if (intersects.length > 0) {
+                intersects[0].object.material.color.set(0xff0000);
+            }
+        }
+        
+        function onMouseUp() {
+            //console.log("mouseUp");
+            if (!isButtonPressed) {
+                
+                isButtonPressed = true;
+                setTimeout(spriteAnimate, 0);
+                
+            }
+            button.material.color.set(new THREE.Color("rgb(255,255,255)"));
         }
         
         function buildSprite(texMat, markerGroup) {
