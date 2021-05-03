@@ -43,6 +43,9 @@
         var raycaster = new THREE.Raycaster();
         var pickables = [];
         var aimGroup;
+		var uvOffsetArray;
+		var baseS, baseT;
+		var sprite;
         
         init();
         animate();
@@ -160,6 +163,10 @@
             window.addEventListener('mousedown', doMouseDown, false);
             // initialize explosion sprite
             initSprite(markerHiro);
+			
+			setUpOffsetArray();
+			sprite = buildSprite();
+			group.add(sprite);
         }
         
         function addMarkerHiro() {
@@ -168,29 +175,23 @@
                 type: 'pattern'
                 , patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro'
             })
-            
+            group = new THREE.Group();
+			markerRootHiro.add(group); 
+			
             let loader = new THREE.TextureLoader();
-            loader.setCrossOrigin('')
-            let texture = loader.load('https://i.imgur.com/czAPVT8.png');
-            
-            let material = new THREE.MeshBasicMaterial({
-                map: texture,
-                //color: 0xffff00,
-                side: THREE.DoubleSide
-            });
-            let geometry = new THREE.PlaneGeometry(1, 1);
-            let mesh = new THREE.Mesh(geometry, material);
-            //mesh.position.y	= geometry.parameters.height/2 // mesh centered at root
-			var sprite = buildSprite();
-            aimGroup = new THREE.Object3D();
-            aimGroup.add(mesh);
-			aimGroup.add(sprite);
-            let origin = new THREE.Mesh(new THREE.OctahedronGeometry(0.1), new THREE.MeshNormalMaterial());
-            markerRootHiro.add(aimGroup, origin);
-            
-            /// add gridhelper
-            var gridXZ = new THREE.GridHelper(1, 10);
-            //markerRootHiro.add (gridXZ);
+            loader.setCrossOrigin('');
+            let geometry = new THREE.PlaneGeometry(2, 2);
+            let material = new THREE.MeshBasicMaterial();
+            let crosshair = new THREE.Mesh(geometry, material);
+			crosshair.rotation.x = -Math.PI/2;
+			loader.load(
+				'https://i.imgur.com/czAPVT8.png',
+				function ( texture ) {
+					crosshair.material = new THREE.MeshBasicMaterial( { map: texture } );
+					crosshair.material.transparent = true;
+				}
+			);
+			group.add(crosshair);
             
             return markerRootHiro;
         }
@@ -202,17 +203,27 @@
             if (arToolkitSource.ready === false) return
             arToolkitContext.update(arToolkitSource.domElement)
             
-            let localCamera = markerHiro.worldToLocal(new THREE.Vector3(0, 0, 0));
-            
-            //to rotate (0, 0, 1) to localCamera [markerCoord]
-            let point = new THREE.Vector3(0, 0, 1);
-            let angle = point.angleTo(localCamera);
-            let axis = new THREE.Vector3();
-            axis.crossVectors(point, localCamera)
-                .normalize();
-            aimGroup.quaternion.setFromAxisAngle(axis, angle);
-            
-            renderer.clear();
+            // to rotate (0,0,1) to localCamera [markerCoord]
+            let localCamera = markerHiro.worldToLocal (new THREE.Vector3(0,0,0))
+  
+			let point = new THREE.Vector3(0, 0, 1);
+			let angle = point.angleTo(localCamera);
+			let axis  = new THREE.Vector3();
+			axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
+			sprite.quaternion.setFromAxisAngle(axis, angle);
+			
+			/*
+			let localCamera = markerHiro.worldToLocal (new THREE.Vector3(0,0,0))
+			
+			// to rotate (0,0,1) to localCamera [markerCoord]
+			let point = new THREE.Vector3(0,0,1);
+			let angle = point.angleTo (localCamera);
+			let axis = new THREE.Vector3();
+			axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
+			aimGroup.quaternion.setFromAxisAngle (axis, angle);
+			*/
+			
+            //renderer.clear();
             renderer.render(scene, camera);
             renderer.render(sceneHUD, cameraHUD);
         }
@@ -281,6 +292,76 @@
             if (event.button === 0) {
                 setTimeout(spriteAnimate, 0);
             }
+        }
+        
+        function buildSprite(texMat, markerGroup) {
+            const size = 2.0;
+            
+            // old school ...
+            let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0
+                    , size / 2, size / 2, 0, -size / 2, size / 2, 0];
+            var geometry = new THREE.BufferGeometry();
+            geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            
+            let indices = [0, 1, 2, 0, 2, 3];
+            geometry.setIndex(indices);
+            
+            let uvs = []
+            uvs.push(0, 0.75, 0.125, 0.75, 0.125, 1, 0, 1); // LL of first frame: [0, 0.75]
+            geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            
+            var material = new THREE.MeshBasicMaterial();
+			var item = new THREE.Mesh(geometry, material);
+			item.position.y = 0.5;
+			var loader = new THREE.TextureLoader();
+			loader.load(
+				'https://i.imgur.com/j5NYK55.png',
+				function ( texture ) {
+				item.material = new THREE.MeshBasicMaterial( { map: texture } );
+				item.material.transparent = true;
+				}
+			);
+			return item;
+        }
+        
+        function setUpOffsetArray() {
+            uvOffsetArray = [];
+            var rowCount = 4; // 4x8 sprites
+            var colCount = 8;
+            for (var i = 0; i < rowCount; i++) {
+                var row = [];
+                for (var j = 0; j < colCount; j++)
+                    row.push(new THREE.Vector2(j * 0.125, -0.25 * i));
+                uvOffsetArray.push(row);
+            }
+        }
+        
+        function _spriteAnimate() {
+            let msg = `[${baseS}] [${baseT}]`
+            console.log(msg);
+            
+            sprite.material.map.offset.copy(uvOffsetArray[baseS][baseT]);
+            baseT = (baseT + 1) % 8;
+            if (baseT === 0) {
+                baseS = (baseS + 1) % 4;
+            }
+            
+            if (baseS !== 3 || baseT !== 7) // NOT (baseS = 3 ^ baseT = 7)
+                setTimeout(_spriteAnimate, 100); // proceed to next frame
+            else {
+                sprite.material.map.offset.copy(uvOffsetArray[0][0]); // back to first frame
+            }
+        }
+        
+        // trigger the animation
+        function spriteAnimate() {
+            if (sprite === undefined) {
+                console.log('return in spriteAnimate')
+                return;
+            }
+            
+            baseS = baseT = 0;
+            setTimeout(_spriteAnimate, 100);
         }
         
     </script>
