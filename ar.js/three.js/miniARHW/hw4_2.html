@@ -44,20 +44,20 @@
                 this.centerY = cy;
                 this.size = size; // circle radius
                 let material = new THREE.MeshBasicMaterial({
-                    color: colorString,
-                    transparent: true,
-                    opacity: 0.7
+                    color: colorString
+                    , transparent: true
+                    , opacity: 0.7
                 });
                 if (map)
                     material.map = map;
                 this.mesh = new THREE.Mesh(new THREE.CircleGeometry(size, 36), material);
                 this.mesh.position.set(cx, cy, 0);
             }
-
+            
             setLocation(lx, ly) { // 2D-HUD 
                 this.mesh.position.set(lx, ly, 0);
             }
-
+            
             d2To(v) { // 2-norm
                 return Math.sqrt((v[0] - this.centerX) * (v[0] - this.centerX) +
                     (v[1] - this.centerY) * (v[1] - this.centerY));
@@ -90,45 +90,45 @@
             
             // for multi-pass rendering
             renderer.autoClear = false;
-
+            
             // width/height ratio
             whRatio = window.innerWidth / window.innerHeight;
             console.log('[onInit] width: ' + window.innerWidth)
             console.log('[onInit] height: ' + window.innerHeight)
-
+            
             // init scene and camera
             scene = new THREE.Scene();
             // Create a camera
             camera = new THREE.Camera();
             scene.add(camera);
-
+            
             // for HUD scene
             sceneHUD = new THREE.Scene();
-
+            
             halfH = 10;
             halfW = halfH * whRatio;
-
+            
             cameraHUD = new THREE.OrthographicCamera(-halfW, halfW, halfH, -halfH, -10, 10);
-
+            
             ///////////////////////////////////////////////////////
-
+            
             let loader = new THREE.TextureLoader();
             loader.setCrossOrigin(''); // 重要！
             loader.load(
                 // resource URL
                 'https://i.imgur.com/b6I5kb7.png',
-
+                
                 // Function when resource is loaded
-                function(texture) {
+                function (texture) {
                     console.log('texture loaded ...')
                     // texture load完，再建button
                     var buttonSize = halfH / 3; // radius
                     button1 = new Button(halfW / 2, -halfH / 2, buttonSize, 'white', texture);
                     sceneHUD.add(button1.mesh);
                 },
-
+                
             );
-
+            
             button2 = new Button(-halfW / 2, -halfH / 2, halfH / 3, 'cyan');
             sceneHUD.add(button2.mesh);
             
@@ -185,11 +185,11 @@
             markerHiro = addMarkerHiro();
             scene.add(markerHiro);
             
-			// handle resize: can be iPAD change orientation
-            window.addEventListener('resize', function() {
+            // handle resize: can be iPAD change orientation
+            window.addEventListener('resize', function () {
                 onResize()
             })
-
+            
             if (_iOSDevice) {
                 window.addEventListener('touchstart', onTouchStart, false);
                 // touchend ... use the same callback as mouseup
@@ -197,8 +197,8 @@
                 window.addEventListener('mousedown', onMouseDown, false);
                 window.addEventListener('mouseup', onMouseUp, false);
             }
-			
-			// to trigger explosion
+            
+            // to trigger explosion
             window.addEventListener('mousedown', doMouseDown, false);
             // initialize explosion sprite
             initSprite(markerHiro);
@@ -209,7 +209,8 @@
             
             // old school ...
             let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0
-                    , size / 2, size / 2, 0, -size / 2, size / 2, 0];
+                    
+                , size / 2, size / 2, 0, -size / 2, size / 2, 0];
             var geometry = new THREE.BufferGeometry();
             geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             
@@ -314,7 +315,7 @@
         }
         
         function addMarkerHiro() {
-		
+            
             let markerRootHiro = new THREE.Group();
             var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRootHiro, {
                 type: 'pattern'
@@ -322,17 +323,21 @@
             })
             
             // add a boxGeometry
-
-            let geometry = new THREE.BoxGeometry(1, 1, 1);
-            let material = new THREE.MeshNormalMaterial({
-                transparent: true,
-                opacity: 0.5,
-                side: THREE.DoubleSide
-            });
-            mesh = new THREE.Mesh(geometry, material);
-            mesh.position.y = geometry.parameters.height / 2
-
-            markerRootHiro.add(mesh);
+            
+            let geometry = new THREE.PlaneGeometry(2, 2);
+            let material = new THREE.MeshBasicMaterial();
+            let crosshair = new THREE.Mesh(geometry, material);
+            crosshair.rotation.x = -Math.PI / 2;
+            loader.load(
+                'https://i.imgur.com/dRW6CCO.png'
+                , function (texture) {
+                    crosshair.material = new THREE.MeshBasicMaterial({
+                        map: texture
+                    });
+                    crosshair.material.transparent = true;
+                }
+            );
+            markerRootHiro.add(crosshair);
             return markerRootHiro;
         }
         
@@ -345,7 +350,7 @@
             
             renderer.clear();
             renderer.render(scene, camera);
-
+            
             // 重要：沒有marker, 就沒有button
             button1.mesh.material.visible = markerRoot.visible;
             button2.mesh.material.visible = markerRoot.visible;
