@@ -231,7 +231,7 @@
         function onTouchStart(event) {
             event.preventDefault();
             
-            if (event.button === 0) {
+			if (event.button === 0) {
                 setTimeout(spriteAnimate, 0);
             }
             var touches = event.changedTouches;
@@ -246,7 +246,17 @@
                 var intersects = raycaster.intersectObjects(pickables);
                 
                 if (intersects.length > 0) {
+                    $('#press')
+                        .css('color', 'yellow');
+                    $('#press')
+                        .html('<p id="press" style ="color:black;text-align:center;">press</p>');
                     setTimeout(spriteAnimate, 0);
+                } else {
+                    $('#press')
+                        .css('color', 'green');
+                    $('#press')
+                        .html('<p id="press" style ="color:black;text-align:center;">press the wrong place</p>');
+                    isActive = false;
                 }
             }
         }
@@ -288,7 +298,6 @@
             $('#press')
                 .html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
             isActive = false;
-            
         }
         
         function doMouseDown(event) {
@@ -302,7 +311,8 @@
             
             // old school ...
             let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0
-                    
+                
+                
                 , size / 2, size / 2, 0, -size / 2, size / 2, 0];
             var geometry = new THREE.BufferGeometry();
             geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
