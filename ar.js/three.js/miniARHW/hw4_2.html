@@ -141,7 +141,7 @@
             button = new THREE.Mesh(geometry, material);
             var loader = new THREE.TextureLoader();
             loader.load(
-                'https://i.imgur.com/s6VLMFm.png'
+                'https://i.imgur.com/yG8Dj0o.png'
                 , function (texture) {
                     texture.repeat.set(0.4, 0.4);
                     texture.offset.set(0.4, 0.4);
@@ -208,22 +208,9 @@
             let point = new THREE.Vector3(0, 0, 1);
             let angle = point.angleTo(localCamera);
             let axis = new THREE.Vector3();
-            axis.crossVectors(point, localCamera)
-                .normalize(); // normalization is IMPORTANT!
+            axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
             sprite.quaternion.setFromAxisAngle(axis, angle);
             
-            /*
-            let localCamera = markerHiro.worldToLocal (new THREE.Vector3(0,0,0))
-            
-            // to rotate (0,0,1) to localCamera [markerCoord]
-            let point = new THREE.Vector3(0,0,1);
-            let angle = point.angleTo (localCamera);
-            let axis = new THREE.Vector3();
-            axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
-            aimGroup.quaternion.setFromAxisAngle (axis, angle);
-            */
-            
-            //renderer.clear();
             renderer.render(scene, camera);
             renderer.render(sceneHUD, cameraHUD);
         }
@@ -293,11 +280,11 @@
             }
         }
         
-        function buildSprite(texMat, markerGroup) {
+        function buildSprite() {
             const size = 2.0;
             
             // old school ...
-            let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0 , size / 2, size / 2, 0, -size / 2, size / 2, 0];
+            let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0, size / 2, size / 2, 0, -size / 2, size / 2, 0];
             var geometry = new THREE.BufferGeometry();
             geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             
@@ -362,5 +349,6 @@
             baseS = baseT = 0;
             setTimeout(_spriteAnimate, 100);
         }
+        
     </script>
 </body>
