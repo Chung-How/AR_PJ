@@ -19,7 +19,7 @@
             
         </style>
     </head>
-
+    
     <body>
         <div id="info">Cannon Firing<br>
             <button id="up">up</button><br>
@@ -52,20 +52,26 @@
                         .setLength(SPEED);
                     this.pos = barrel.localToWorld(new THREE.Vector3(0, 22, 0));
                     this.force = force;
+                    /*
+					// Euler's method
+					let force = new THREE.Vector3 (0,-10,0);    // gravity
+					force.add (new THREE.Vector3(0,0,2));        // wind
+					force.add (vel.clone().multiplyScalar (-0.1251)); // drag
+  
+					vel.add (force.multiplyScalar(dt));
+					pos.add (vel.clone().multiplyScalar(dt));
+					ball.position.copy (pos);
+					*/
                 }
                 
                 update(dt) {
                     
                     // Euler's method
-                    this.vel.add(this.force.clone()
-                        .multiplyScalar(dt));
+                    this.vel.add(this.force.clone().multiplyScalar(dt));
                     let prePos = this.pos.clone();
-                    this.pos.add(this.vel.clone()
-                        .multiplyScalar(dt));
+                    this.pos.add(this.vel.clone().multiplyScalar(dt));
                     this.main.position.copy(this.pos);
-                    this.main.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.pos.clone()
-                        .sub(prePos)
-                        .normalize());
+                    this.main.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.pos.clone().sub(prePos).normalize());
                 }
             }
             
@@ -75,23 +81,22 @@
                     this.main = new THREE.Group();
                     this.barrelPart = new THREE.Group();
                     
-                    let geo, mat;
-                    geo = new THREE.SphereGeometry(10, 20, 20, Math.PI + Math.PI * 0.1, Math.PI * 1.8, 0, Math.PI / 2);
-                    mat = new THREE.MeshNormalMaterial();
-                    let body = new THREE.Mesh(geo, mat);
+                    let geometry = new THREE.SphereGeometry(10, 20, 20, Math.PI + Math.PI * 0.1, Math.PI * 1.8, 0, Math.PI / 2);
+                    let material = new THREE.MeshNormalMaterial();
+                    let body = new THREE.Mesh(geometry, material);
                     this.main.add(body);
                     
-                    geo = new THREE.CylinderGeometry(2, 2, 20, 18);
-                    mat = new THREE.MeshNormalMaterial();
-                    let barrel = new THREE.Mesh(geo, mat);
+                    let geometry1 = new THREE.CylinderGeometry(2, 2, 20, 18);
+                    let material1 = new THREE.MeshNormalMaterial();
+                    let barrel = new THREE.Mesh(geometry1, material);
                     barrel.position.y = 10;
                     this.barrelPart.add(barrel);
                     this.barrelPart.rotation.z = -Math.PI / 6;
                     this.main.add(this.barrelPart);
                     
-                    this.force = new THREE.Vector3(0, -10, 0);
+                    this.force = new THREE.Vector3(0, -10, 0); 	// gravity
+                    this.force.add(new THREE.Vector3(0, 0, 2)); // wind
                     this.fire = false;
-                    
                 }
                 
                 update(dt) {
