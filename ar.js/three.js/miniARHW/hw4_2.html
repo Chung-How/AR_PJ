@@ -28,7 +28,7 @@
         var camera, cameraHUD, scene, sceneHUD, renderer;
         var stats;
         var arToolKitSource, arToolKitContext;
-        var markerHiro, markerRoot;
+        var markerHiro, markerRootHiro;
         var theta = 0;
         var pos = 0;
         var angle = 0;
@@ -170,7 +170,7 @@
         function addMarkerHiro() {
             let markerRootHiro = new THREE.Group();
             
-            var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+            var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRootHiro, {
                 type: 'pattern'
                 , patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro'
             })
@@ -210,7 +210,7 @@
             
             renderer.clear();
             renderer.render(scene, camera);
-            button.mesh.material.visible = markerRoot.visible;
+            button.mesh.material.visible = markerRootHiro.visible;
 			
             let localCamera = markerHiro.worldToLocal(new THREE.Vector3(0, 0, 0))
             
