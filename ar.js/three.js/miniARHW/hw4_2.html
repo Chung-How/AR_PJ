@@ -208,7 +208,8 @@
             let point = new THREE.Vector3(0, 0, 1);
             let angle = point.angleTo(localCamera);
             let axis = new THREE.Vector3();
-            axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
+            axis.crossVectors(point, localCamera)
+                .normalize(); // normalization is IMPORTANT!
             sprite.quaternion.setFromAxisAngle(axis, angle);
             
             renderer.render(scene, camera);
@@ -319,7 +320,7 @@
         
         function _spriteAnimate() {
             let msg = `[${baseS}] [${baseT}]`
-			console.log(msg);
+            console.log(msg);
             
             sprite.material.map.offset.copy(uvOffsetArray[baseS][baseT]);
             baseT = (baseT + 1) % 8;
@@ -340,6 +341,7 @@
                 console.log('return in spriteAnimate')
                 return;
             }
+            
             baseS = baseT = 0;
             setTimeout(_spriteAnimate, 100);
         }
