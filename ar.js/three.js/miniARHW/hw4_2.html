@@ -211,23 +211,20 @@
             renderer.render(scene, camera);
             renderer.render(sceneHUD, cameraHUD);
         }
-		/*
+
         function onTouchStart(event) {
             event.preventDefault();
             
-			if (event.button === 0) {
-                setTimeout(spriteAnimate, 0);
-            }
+			if (!isButtonPressed) {
+				isButtonPressed = true;
+				setTimeout(spriteAnimate, 0);
+			}
         }
         
         function onTouchEnd(event) {
             event.preventDefault();
             
-			if (event.button === 0) {
-                setTimeout(spriteAnimate, 0);
-            }
         }
-        */
 		
         function onMouseDown(event) {
             event.preventDefault();
