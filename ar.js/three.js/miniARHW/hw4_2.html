@@ -18,6 +18,7 @@
         hw4-2
     </div>
     
+	<script src="explode.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://threejs.org/build/three.min.js"></script>
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -29,22 +30,16 @@
         var stats;
         var arToolKitSource, arToolKitContext;
         var markerHiro, markerRootHiro;
-        var theta = 0;
-        var pos = 0;
-        var angle = 0;
         var group;
         var isActive = false;
-        var omega = 0;
+        var loader;
         var halfH, halfW, whRatio;
         var button;
         var mouse = new THREE.Vector2();
         var raycaster = new THREE.Raycaster();
-        var pickables = [];
 		var _iOSDevice;
-        
-        var uvOffsetArray;
-        var baseS, baseT;
-        var sprite;
+		var sprite, uvOffsetArray, baseS, baseT;
+		var isButtonPressed = false;
         
         init();
         animate();
@@ -67,6 +62,10 @@
                 // antialias	: true,
                 alpha: true
             });
+			
+			raycaster = new THREE.Raycaster();
+			mouse = new THREE.Vector2();
+			loader =  new THREE.TextureLoader();
             renderer.autoClear = false;
             renderer.setClearColor(new THREE.Color('lightgrey'), 0)
             // renderer.setPixelRatio( 1/2 );
@@ -155,6 +154,7 @@
             markerHiro = addMarkerHiro();
             scene.add(markerHiro);
 			
+			initSprite(markerHiro);
 			sprite = buildSprite();
             group.add(sprite);
         }
@@ -215,6 +215,10 @@
         function onTouchStart(event) {
             event.preventDefault();
             
+			if (event.button === 0) {
+                setTimeout(spriteAnimate, 0);
+            }
+			/*
             var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
                 
@@ -230,15 +234,21 @@
                     isActive = true;
                 }
             }
+			*/
         }
         
         function onTouchEnd(event) {
             event.preventDefault();
             
+			if (event.button === 0) {
+                setTimeout(spriteAnimate, 0);
+            }
+			/*
             var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
                 isActive = false;
             }
+			*/
         }
         
         function onMouseDown(event) {
@@ -247,6 +257,10 @@
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             
+			if (event.button === 0) {
+                setTimeout(spriteAnimate, 0);
+            }
+			/*
             // find intersections (only pick the HUD scene, using OrthographicCamera)  		
             raycaster.setFromCamera(mouse, cameraHUD);
             
@@ -255,13 +269,14 @@
             if (intersects.length > 0) {
                 isActive = true;
             }
+			*/
         }
         
         function onMouseUp(event) {
-            event.preventDefault();
-			
-            isActive = false;
-            
+            if (!isButtonPressed) {
+				isButtonPressed = true;
+				setTimeout(spriteAnimate, 0);
+			}
         }
         
         function buildSprite() {
@@ -313,14 +328,15 @@
             
             sprite.material.map.offset.copy(uvOffsetArray[baseS][baseT]);
             baseT = (baseT + 1) % 8;
-            if (baseT === 0) {
+            if (baseT == 0) {
                 baseS = (baseS + 1) % 4;
             }
             
-            if (baseS !== 3 || baseT !== 7) // NOT (baseS = 3 ^ baseT = 7)
+            if (baseS != 3 || baseT != 7) { // NOT (baseS = 3 ^ baseT = 7)
                 setTimeout(_spriteAnimate, 100); // proceed to next frame
-            else {
+            }else {
                 sprite.material.map.offset.copy(uvOffsetArray[0][0]); // back to first frame
+				isButtonPressed = false;
             }
         }
         
@@ -330,7 +346,6 @@
                 console.log('return in spriteAnimate')
                 return;
             }
-            
             baseS = baseT = 0;
             setTimeout(_spriteAnimate, 100);
         }
