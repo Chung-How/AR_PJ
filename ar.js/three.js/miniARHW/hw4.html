@@ -38,6 +38,7 @@
             var ball;
             var pos, vel, force;
             var controls, keyboard;
+            const SPEED = 25;
             
             class Ball {
                 constructor(barrel, force, direct) {
@@ -45,7 +46,6 @@
                     this.main.rotation.y = direct;
                     scene.add(this.main);
                     
-                    const SPEED = 25;
                     this.vel = barrel.localToWorld(new THREE.Vector3(0, 20, 0))
                         .sub(
                             barrel.localToWorld(new THREE.Vector3(0, 0, 0)))
@@ -94,9 +94,17 @@
                     this.barrelPart.rotation.z = -Math.PI / 6;
                     this.main.add(this.barrelPart);
                     
-                    this.force = new THREE.Vector3(0, -10, 0); 	// gravity
+                    this.vel = barrel.localToWorld(new THREE.Vector3(0, 20, 0))
+                        .sub(
+                            barrel.localToWorld(new THREE.Vector3(0, 0, 0)))
+                        .setLength(SPEED);
+                    
+                    this.force = new THREE.Vector3(0, -10, 0); // gravity
                     this.force.add(new THREE.Vector3(0, 0, 2)); // wind
+                    this.force.add(this.vel.clone()
+                        .multiplyScalar(-0.1251)); // drag
                     this.fire = false;
+                    
                 }
                 
                 update(dt) {
