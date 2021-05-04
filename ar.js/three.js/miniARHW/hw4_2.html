@@ -15,10 +15,10 @@
     <div style='position: absolute; top: 10px; width:100%; text-align: center; z-index: 1;'>
         <a href="https://github.com/jeromeetienne/AR.js/" target="_blank">AR.js</a>
         - three.js<br>
-        hw4-2
+        hw4-part2 (Hiro)
     </div>
     
-	<script src="explode.js"></script>
+    <script src="explode.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://threejs.org/build/three.min.js"></script>
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -31,15 +31,15 @@
         var arToolKitSource, arToolKitContext;
         var markerHiro, markerRootHiro;
         var group;
-        var isActive = false;
         var loader;
         var halfH, halfW, whRatio;
         var button;
         var mouse = new THREE.Vector2();
         var raycaster = new THREE.Raycaster();
-		var _iOSDevice;
-		var sprite, uvOffsetArray, baseS, baseT;
-		var isButtonPressed = false;
+        var _iOSDevice;
+        var sprite, uvOffsetArray, baseS, baseT;
+        var isButtonPressed = false;
+        var pickables = [];
         
         init();
         animate();
@@ -61,10 +61,8 @@
                 // antialias	: true,
                 alpha: true
             });
-			
-			raycaster = new THREE.Raycaster();
-			mouse = new THREE.Vector2();
-			loader =  new THREE.TextureLoader();
+            
+            loader = new THREE.TextureLoader();
             renderer.autoClear = false;
             renderer.setClearColor(new THREE.Color('lightgrey'), 0)
             // renderer.setPixelRatio( 1/2 );
@@ -133,7 +131,7 @@
                 camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
             })
             
-			let geometry = new THREE.CircleGeometry(3, 32);
+            let geometry = new THREE.CircleGeometry(3, 32);
             let material = new THREE.MeshBasicMaterial();
             button = new THREE.Mesh(geometry, material);
             var loader = new THREE.TextureLoader();
@@ -147,15 +145,16 @@
                     });
                 }
             );
-            button.position.set(-halfW / 2, -halfH / 2, halfH / 3);
-			button.position.y = -(halfH / 3 * 2);
+            button.position.set(-halfW / 3, -halfH / 3, halfH / 3);
+            button.position.y = (-halfH / 2);
+            pickables.push(button);
             sceneHUD.add(button);
-			
+            
             markerHiro = addMarkerHiro();
             scene.add(markerHiro);
-			
-			sprite = initSprite(markerHiro);
-			sprite = buildSprite();
+            
+            sprite = initSprite(markerHiro);
+            sprite = buildSprite();
             group.add(sprite);
         }
         
@@ -167,9 +166,9 @@
                 , patternUrl: THREEx.ArToolkitContext.baseURL + '../data/data/patt.hiro'
             })
             
-			group = new THREE.Group();
+            group = new THREE.Group();
             markerRootHiro.add(group);
-			
+            
             // instantiate a loader
             var loader = new THREE.TextureLoader();
             loader.setCrossOrigin('');
@@ -199,45 +198,96 @@
             
             if (arToolkitSource.ready === false) return
             arToolkitContext.update(arToolkitSource.domElement)
-			
+            
             let localCamera = markerHiro.worldToLocal(new THREE.Vector3(0, 0, 0))
             
             let point = new THREE.Vector3(0, 0, 1);
             let angle = point.angleTo(localCamera);
             let axis = new THREE.Vector3();
-            axis.crossVectors(point, localCamera).normalize(); // normalization is IMPORTANT!
+            axis.crossVectors(point, localCamera)
+                .normalize(); // normalization is IMPORTANT!
             sprite.quaternion.setFromAxisAngle(axis, angle);
             
+            renderer.clear();
             renderer.render(scene, camera);
             renderer.render(sceneHUD, cameraHUD);
         }
-
+        
         function onTouchStart(event) {
             event.preventDefault();
             
-			if (!isButtonPressed) {
-				isButtonPressed = true;
-				setTimeout(spriteAnimate, 0);
-			}
+            if (!isButtonPressed) {
+                isButtonPressed = true;
+                setTimeout(spriteAnimate, 0);
+            }
+        }
+        
+        function onTouchStart(event) {
+            event.preventDefault();
+            
+            if (intersects.length > 0) {
+                if (!isButtonPressed) {
+                    isButtonPressed = true;
+                    setTimeout(spriteAnimate, 0);
+                }
+            }
+			
+            var touches = event.changedTouches;
+            for (var i = 0; i < touches.length; i++) {
+                
+                mouse.x = (touches[i].pageX / window.innerWidth) * 2 - 1;
+                mouse.y = -(touches[i].pageY / window.innerHeight) * 2 + 1;
+                
+                // find intersections (only pick the HUD scene, using OrthographicCamera)  		
+                raycaster.setFromCamera(mouse, cameraHUD);
+                
+                var intersects = raycaster.intersectObjects(pickables);
+                
+                if (intersects.length > 0) {
+                    if (!isButtonPressed) {
+                        isButtonPressed = true;
+                        setTimeout(spriteAnimate, 0);
+                    }
+                }
+            }
         }
         
         function onTouchEnd(event) {
             event.preventDefault();
             
+            var touches = event.changedTouches;
+            for (var i = 0; i < touches.length; i++) {
+                isButtonPressed = false;
+            }
         }
-		
+        
         function onMouseDown(event) {
             event.preventDefault();
             
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // find intersections (only pick the HUD scene, using OrthographicCamera)  		
+            raycaster.setFromCamera(mouse, cameraHUD);
+            
+            if (!isButtonPressed) {
+                isButtonPressed = true;
+                setTimeout(spriteAnimate, 0);
+            }
+            var intersects = raycaster.intersectObjects(pickables);
+            
+            if (intersects.length > 0) {
+                if (!isButtonPressed) {
+                    isButtonPressed = true;
+                    setTimeout(spriteAnimate, 0);
+                }
+            }
         }
         
         function onMouseUp(event) {
-            if (!isButtonPressed) {
-				isButtonPressed = true;
-				setTimeout(spriteAnimate, 0);
-			}
+            event.preventDefault();
+            
+            isButtonPressed = false;
         }
         
         function buildSprite() {
@@ -270,7 +320,7 @@
             );
             return item;
         }
-
+        
         function setUpOffsetArray() {
             uvOffsetArray = [];
             var rowCount = 4; // 4x8 sprites
@@ -295,9 +345,9 @@
             
             if (baseS != 3 || baseT != 7) { // NOT (baseS = 3 ^ baseT = 7)
                 setTimeout(_spriteAnimate, 100); // proceed to next frame
-            }else {
+            } else {
                 sprite.material.map.offset.copy(uvOffsetArray[0][0]); // back to first frame
-				isButtonPressed = false;
+                isButtonPressed = false;
             }
         }
         
