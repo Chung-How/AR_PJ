@@ -46,29 +46,6 @@
         var baseS, baseT;
         var sprite;
         
-        class Button {
-            constructor(cx, cy, size, colorString = 'yellow', map = null) {
-                this.centerX = cx;
-                this.centerY = cy;
-                this.size = size;
-                let material = new THREE.MeshBasicMaterial({
-                    color: colorString
-                    , transparent: true
-                    , opacity: 0.7
-                });
-                if (map)
-                    material.map = map;
-                this.mesh = new THREE.Mesh(new THREE.CircleGeometry(size, 32), material);
-                this.mesh.position.set(cx, cy, 0);
-            }
-            setLocation(lx, ly) {
-                this.mesh.position.set(lx, ly, 0);
-            }
-            d2To(v) {
-                return Math.sqrt((v[0] - this.centerX) * (v[0] - this.centerX) + (v[1] - this.centerY) * (v[1] - this.centerY));
-            }
-        }
-        
         init();
         animate();
         
@@ -158,13 +135,28 @@
                 camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
             })
             
+			let geometry = new THREE.CircleGeometry(3, 32);
+            let material = new THREE.MeshBasicMaterial();
+            button = new THREE.Mesh(geometry, material);
+            var loader = new THREE.TextureLoader();
+            loader.load(
+                'https://i.imgur.com/yG8Dj0o.png'
+                , function (texture) {
+                    texture.repeat.set(0.4, 0.4);
+                    texture.offset.set(0.4, 0.4);
+                    button.material = new THREE.MeshBasicMaterial({
+                        map: texture
+                    });
+                }
+            );
+            button.position.set(-halfW / 2, -halfH / 2, halfH / 3);
+            sceneHUD.add(button);
+			
             markerHiro = addMarkerHiro();
             scene.add(markerHiro);
 			
-			// to trigger explosion
-            //window.addEventListener('mousedown', doMouseDown, false);
-            // initialize explosion sprite
-            initSprite(markerHiro);
+			sprite = buildSprite();
+            group.add(sprite);
         }
         
         function addMarkerHiro() {
@@ -207,10 +199,6 @@
             
             if (arToolkitSource.ready === false) return
             arToolkitContext.update(arToolkitSource.domElement)
-            
-            renderer.clear();
-            renderer.render(scene, camera);
-            button.mesh.material.visible = markerRootHiro.visible;
 			
             let localCamera = markerHiro.worldToLocal(new THREE.Vector3(0, 0, 0))
             
@@ -222,12 +210,6 @@
             
             renderer.render(scene, camera);
             renderer.render(sceneHUD, cameraHUD);
-        }
-        
-        function clamp(x, xLo, xHi) {
-            if (x < xLo) return xLo;
-            if (x > xHi) return xHi;
-            else return x;
         }
         
         function onTouchStart(event) {
@@ -245,10 +227,6 @@
                 var intersects = raycaster.intersectObjects(pickables);
                 
                 if (intersects.length > 0) {
-                    $('#press')
-                        .css('color', 'yellow');
-                    $('#press')
-                        .html('<p id="press" style ="color:white;text-align:center;">press</p>');
                     isActive = true;
                 }
             }
@@ -259,10 +237,6 @@
             
             var touches = event.changedTouches;
             for (var i = 0; i < touches.length; i++) {
-                $('#press')
-                    .css('color', 'cyan');
-                $('#press')
-                    .html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
                 isActive = false;
             }
         }
@@ -279,31 +253,22 @@
             var intersects = raycaster.intersectObjects(pickables);
             
             if (intersects.length > 0) {
-                $('#press')
-                    .css('color', 'yellow');
-                $('#press')
-                    .html('<p id="press" style ="color:white;text-align:center;">press</p>');
                 isActive = true;
             }
         }
         
         function onMouseUp(event) {
             event.preventDefault();
-            
-            $('#press')
-                .css('color', 'cyan');
-            $('#press')
-                .html('<p id="press" style ="color:white;text-align:center;">did not press</p>');
+			
             isActive = false;
             
         }
         
-        function buildSprite(texMat, markerGroup) {
+        function buildSprite() {
             const size = 2.0;
             
             // old school ...
-            let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0
-                    , size / 2, size / 2, 0, -size / 2, size / 2, 0];
+            let vertices = [-size / 2, -size / 2, 0, size / 2, -size / 2, 0, size / 2, size / 2, 0, -size / 2, size / 2, 0];
             var geometry = new THREE.BufferGeometry();
             geometry.addAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             
@@ -314,54 +279,22 @@
             uvs.push(0, 0.75, 0.125, 0.75, 0.125, 1, 0, 1); // LL of first frame: [0, 0.75]
             geometry.addAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             
-            geometry.computeBoundingSphere();
-            geometry.computeFaceNormals();
-            geometry.computeVertexNormals();
-            
-            sprite = new THREE.Mesh(geometry, texMat);
-            markerGroup.add(sprite);
-        }
-        
-        function initSprite(markerGroup) {
-            setUpOffsetArray();
-            
-            // instantiate a loader
+            var material = new THREE.MeshBasicMaterial();
+            var item = new THREE.Mesh(geometry, material);
+            item.position.y = 0.5;
             var loader = new THREE.TextureLoader();
-            loader.setCrossOrigin('');
-            // load a resource
             loader.load(
-                // resource URL
-                'https://i.imgur.com/6ePTx6p.png',
-                
-                // Function when resource is loaded
-                function (texture) {
-                    // Plane with default texture coordinates [0,1]x[0,1]
-                    var texMat = new THREE.MeshBasicMaterial({
+                'https://i.imgur.com/j5NYK55.png'
+                , function (texture) {
+                    item.material = new THREE.MeshBasicMaterial({
                         map: texture
-                        , transparent: true, // cutout texture: set transparent: true
-                        side: THREE.DoubleSide
                     });
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    buildSprite(texMat, markerGroup);
-                },
-                // Function called when download progresses
-                function (xhr) {
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                },
-                // Function called when download errors
-                function (xhr) {
-                    console.log('An error happened');
+                    item.material.transparent = true;
                 }
             );
-            
+            return item;
         }
-        
-        
-        // slightly different
-        // this is an OFFSET array
-        // how the array going to increment in this state 
-        // initial uv (of lower left corner) is (0, 0.75)
+
         function setUpOffsetArray() {
             uvOffsetArray = [];
             var rowCount = 4; // 4x8 sprites
