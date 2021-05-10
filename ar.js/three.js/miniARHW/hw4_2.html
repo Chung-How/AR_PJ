@@ -46,7 +46,7 @@
         
         
         class Button {
-            constructor(cx, cy, size, colorString = 'red', map = null) {
+            constructor(cx, cy, size, colorString = 'yellow', map = null) {
                 this.centerX = cx;
                 this.centerY = cy;
                 this.size = size;
@@ -57,12 +57,14 @@
                 });
                 if (map)
                     material.map = map;
-                this.mesh = new THREE.Mesh(new THREE.CircleGeometry(size, 36), material);
+                this.mesh = new THREE.Mesh(new THREE.CircleGeometry(size, 30), material);
                 this.mesh.position.set(cx, cy, 0);
             }
+			
             setLocation(lx, ly) {
                 this.mesh.position.set(lx, ly, 0);
             }
+			
             d2To(v) {
                 return Math.sqrt(v[0] - this.centerX) * (v[0] - this.centerX) + (v[1] - this.centerY) * (v[1] - this.centerY);
             }
@@ -180,7 +182,6 @@
             markerHiro.add(mesh1);
             
             initSprite(markerHiro);
-            
         }
         
         function addMarkerHiro() {
@@ -210,7 +211,7 @@
                     /*var texMat = new THREE.MeshBasicMaterial({
                       map: texture
                     }); */
-                    button = new Button(-halfW / 2, -halfH / 2, halfH / 3, 'cyan', texture);
+                    button = new Button(-halfW / 2, -halfH / 2, halfH / 3, 'red', texture);
                     sceneHUD.add(button.mesh);
                     pickables.push(button.mesh);
                 }
