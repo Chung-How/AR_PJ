@@ -126,6 +126,13 @@
                         this.isShooting = false;
                         
                     }
+					else if(this.cannonball.pos.x == this.cannonball.pos.z){
+					
+						markerHiro.remove(this.cannonball.main);
+                        this.isShooting = false;
+						
+					}
+					
                 }
                 this.drawLine();
             }
@@ -164,10 +171,7 @@
                 
                 if (!this.isShooting) {
                     this.isShooting = true;
-					if(this.barrelPart.x != 0)
-						this.cannonball = new Cannonball(this.barrelPart, this.main.rotation.y, this.power, this.force);
-					else
-						this.isShooting = false;
+					this.cannonball = new Cannonball(this.barrelPart, this.main.rotation.y, this.power, this.force);
                 }
                 
             }
