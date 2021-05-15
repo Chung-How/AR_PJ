@@ -109,9 +109,8 @@
             
             update(dt) {
                 
-                if (this.isShooting && markerKanji.children[2].visible) {
+                if (this.isShooting && markerKanji.children[2].visible && markerKanji.children[0].visible) {
                     this.cannonball.update(dt);
-					markerHiro.remove(this.cannonball.main);
 					
                     if (this.cannonball.pos.y < 0) {
 					
