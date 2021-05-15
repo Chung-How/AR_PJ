@@ -110,7 +110,7 @@
             
             update(dt) {
                 
-                if (this.isShooting && markerKanji.children[2].visible && markerKanji.children[0].visible) {
+                if (this.isShooting) {
                     this.cannonball.update(dt);
 					
                     if (this.cannonball.pos.y < 0) {
