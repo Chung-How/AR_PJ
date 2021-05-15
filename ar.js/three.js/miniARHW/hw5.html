@@ -63,6 +63,7 @@
             
             update(dt) {
                 
+				if (this.isShooting && markerKanji.children[2].visible) {
                 // Euler's method
                 this.vel.add(this.force.clone()
                     .multiplyScalar(dt));
@@ -73,7 +74,7 @@
                 this.main.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.pos.clone()
                     .sub(prePos)
                     .normalize());
-                
+                }
             }
             
         }
