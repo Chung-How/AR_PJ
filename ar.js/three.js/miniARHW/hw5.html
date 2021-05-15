@@ -23,8 +23,8 @@
     <script src="https://threejs.org/examples/js/libs/stats.min.js"></script>
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script src="https://threejs.org/build/three.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.js"></script>
+    <script src="https://threejs.org/build/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.js"></script>
     
     <script>
         // global variables
@@ -40,7 +40,7 @@
         var kanjiPrePos;
         var N, counter;
         var q1, q2;
-		var arMode = true;
+        var arMode = true;
         
         class Cannonball {
             
@@ -63,7 +63,6 @@
             
             update(dt) {
                 
-				if (this.isShooting && markerKanji.children[2].visible) {
                 // Euler's method
                 this.vel.add(this.force.clone()
                     .multiplyScalar(dt));
@@ -74,7 +73,6 @@
                 this.main.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.pos.clone()
                     .sub(prePos)
                     .normalize());
-                }
             }
             
         }
@@ -112,13 +110,13 @@
                 
                 if (this.isShooting) {
                     this.cannonball.update(dt);
-					
+                    
                     if (this.cannonball.pos.y < 0) {
-					
+                        
                         var vector = this.cannonball.main.worldToLocal(markerKanji.localToWorld(new THREE.Vector3()));
                         var distance = vector.length();
                         //console.log(distance);
-						
+                        
                         if (distance <= 1.1) {
                             markerKanji.children[2].visible = false;
                             sprite.play();
@@ -126,7 +124,7 @@
                         
                         markerHiro.remove(this.cannonball.main);
                         this.isShooting = false;
-						
+                        
                     }
                 }
                 this.drawLine();
@@ -141,14 +139,17 @@
                 vel.setLength(this.power);
                 this.aimPos = this.barrelPart.localToWorld(new THREE.Vector3(0, 2.2 * scale, 0));
                 this.aimPos = markerHiro.worldToLocal(this.aimPos);
-				
+                
                 for (let i = 0; this.aimPos.y > 0; i++) {
                     points.push(this.aimPos.clone());
-                    vel.add(this.force.clone().multiplyScalar(0.1));
-                    this.aimPos.add(vel.clone().multiplyScalar(0.1));
+                    vel.add(this.force.clone()
+                        .multiplyScalar(0.1));
+                    this.aimPos.add(vel.clone()
+                        .multiplyScalar(0.1));
                 }
                 
-                let geometry = new THREE.BufferGeometry().setFromPoints(points);
+                let geometry = new THREE.BufferGeometry()
+                    .setFromPoints(points);
                 let parabola = new THREE.Line(geometry, new THREE.LineDashedMaterial({
                     color: 'cyan'
                 }));
@@ -188,8 +189,12 @@
                 
                 this.size = 5;
                 let vertices = [-this.size / 2, -this.size / 2, 0, this.size / 2
-                                        , -this.size / 2, 0, this.size / 2, this.size / 2
-                                        , 0, -this.size / 2, this.size / 2, 0];
+                    
+                    
+                    , -this.size / 2, 0, this.size / 2, this.size / 2
+                    
+                    
+                    , 0, -this.size / 2, this.size / 2, 0];
                 var geometry = new THREE.BufferGeometry();
                 geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
                 
@@ -217,7 +222,8 @@
                 let point = new THREE.Vector3(0, 0, 1);
                 let angle = point.angleTo(localCamera);
                 let axis = new THREE.Vector3();
-                axis.crossVectors(point, localCamera).normalize();
+                axis.crossVectors(point, localCamera)
+                    .normalize();
                 this.main.quaternion.setFromAxisAngle(axis, angle);
                 
                 if (this.animationStatus == "play") {
@@ -294,7 +300,7 @@
             if (!arMode) {
                 
                 camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 1000);
-				camera.position.set(0, 150, 150);
+                camera.position.set(0, 150, 150);
                 camera.lookAt(new THREE.Vector3(0, 0, 0));
                 
             } else {
@@ -368,7 +374,7 @@
             targetTracking()
             
             renderer.render(scene, camera);
-
+            
         }
         
         function onWindowResize() {
@@ -392,7 +398,7 @@
             
             let markerRoot = new THREE.Group();
             var artoolkitMarker;
-			
+            
             if (arMode) {
                 
                 artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
@@ -455,11 +461,12 @@
         function targetTracking() {
             
             var relativePos = markerHiro.worldToLocal(markerKanji.localToWorld(new THREE.Vector3()));
-			
+            
             if (relativePos.distanceTo(kanjiPrePos) > 0.05) {
                 
                 q1.copy(q2); // save current (old) orientation
-                q2.setFromUnitVectors(new THREE.Vector3(1, 0, 0), relativePos.clone().normalize()); // compute new oriention
+                q2.setFromUnitVectors(new THREE.Vector3(1, 0, 0), relativePos.clone()
+                    .normalize()); // compute new oriention
                 
                 N = 100;
                 counter = 0;
@@ -514,7 +521,7 @@
                     
                 }
                 
-            } else if (markerKanji.children[2].visible) {
+            } else if (markerKanji.children[2].visible && markerKanji.children[0].visible) {
                 cannon.shoot();
             }
             
