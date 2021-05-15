@@ -33,7 +33,7 @@
         
         var arToolKitSource, arToolKitContext, markerHiro, markerKanji;
         
-        var spriteSize = 2;
+        var spriteSize = 1;
         var scale = 0.5;
         
         var cannon, sprite;
@@ -125,14 +125,13 @@
                         markerHiro.remove(this.cannonball.main);
                         this.isShooting = false;
                         
-                    }
-					else if(this.cannonball.pos.x == this.cannonball.pos.z){
-					
-						markerHiro.remove(this.cannonball.main);
+                    } else if (this.cannonball.pos.x == this.cannonball.pos.z) {
+                        
+                        markerHiro.remove(this.cannonball.main);
                         this.isShooting = false;
-						
-					}
-					
+                        
+                    }
+                    
                 }
                 this.drawLine();
             }
@@ -171,7 +170,7 @@
                 
                 if (!this.isShooting) {
                     this.isShooting = true;
-					this.cannonball = new Cannonball(this.barrelPart, this.main.rotation.y, this.power, this.force);
+                    this.cannonball = new Cannonball(this.barrelPart, this.main.rotation.y, this.power, this.force);
                 }
                 
             }
@@ -198,7 +197,9 @@
                 let vertices = [-this.size / 2, -this.size / 2, 0, this.size / 2
                     
                     
+                    
                     , -this.size / 2, 0, this.size / 2, this.size / 2
+                    
                     
                     
                     , 0, -this.size / 2, this.size / 2, 0];
