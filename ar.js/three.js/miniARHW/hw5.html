@@ -111,11 +111,13 @@
                 
                 if (this.isShooting) {
                     this.cannonball.update(dt);
+					
                     if (this.cannonball.pos.y < 0) {
-                        
-                        var vec = this.cannonball.main.worldToLocal(markerKanji.localToWorld(new THREE.Vector3()));
-                        var distance = vec.length();
-                        console.log(distance);
+					
+                        var vector = this.cannonball.main.worldToLocal(markerKanji.localToWorld(new THREE.Vector3()));
+                        var distance = vector.length();
+                        //console.log(distance);
+						
                         if (distance <= 1.1) {
                             markerKanji.children[2].visible = false;
                             sprite.play();
@@ -123,7 +125,7 @@
                         
                         markerHiro.remove(this.cannonball.main);
                         this.isShooting = false;
-                        
+						
                     }
                 }
                 this.drawLine();
@@ -365,7 +367,7 @@
             targetTracking()
             
             renderer.render(scene, camera);
-            
+
         }
         
         function onWindowResize() {
@@ -452,6 +454,7 @@
         function targetTracking() {
             
             var relativePos = markerHiro.worldToLocal(markerKanji.localToWorld(new THREE.Vector3()));
+			
             if (relativePos.distanceTo(kanjiPrePos) > 0.05) {
                 
                 q1.copy(q2); // save current (old) orientation
@@ -510,7 +513,7 @@
                     
                 }
                 
-            } else if (markerKanji.children[2].visible) {
+            } else if (markerKanji.children[2].visible && markerHiro.children[0].visible) {
                 cannon.shoot();
             }
             
